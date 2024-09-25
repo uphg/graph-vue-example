@@ -9,9 +9,23 @@ import { ref, onMounted } from 'vue';
 const container = ref(null);
 
 onMounted(async () => {
+  const animation = {
+    duration: 500,
+    easing: 'linear',
+  };
+  const toolbarMap = {
+    'zoom-in': () => {
+      graph.zoomBy(1.2, animation); 
+    },
+    'zoom-out': () => {
+      graph.zoomBy(0.8, animation);
+    },
+    reset: () => {
+      graph.render();
+    },
+  }
 
-  fetch('https://assets.antv.antgroup.com/g6/element-nodes.json')
-  .then((res) => {
+  fetch('https://assets.antv.antgroup.com/g6/element-nodes.json').then((res) => {
     console.log('res')
     console.log(res)
   })
@@ -26,18 +40,18 @@ onMounted(async () => {
     behaviors: [
       'drag-element','drag-canvas', 'zoom-canvas',
       {
+        type: 'hover-activate',
+        degree: 1, // 👈🏻 Activate relations.
+      },
+      {
         type: 'click-select',
         // inactiveState: 'dim',
         degree: true,
         multiple: true,
         trigger: ['shift'],
-        unselectedState: 'inactive',
-        // unselectedState: 'dim',
+        // unselectedState: 'inactive',
+        unselectedState: 'dim',
       },
-      // {
-      //   type: 'hover-activate',
-      //   degree: 1, // 👈🏻 Activate relations.
-      // },
     ],
 
     node: {
@@ -48,17 +62,19 @@ onMounted(async () => {
         labelWordWrap: true,
         labelMaxWidth: '90%',
         labelFill: 'white',
+        opacity: 1,
+        lineWidth: 1,
       },
-      // animation: {
-      //   enter: false,
-      // },
       state: {
-        dim: {
-          fill: '#cbd5e7',
-          // lineColor: '#cbd5e7',
-          // stroke: '#cbd5e7',
+        selected: {
+          // fill: 'red',
+          color: 'red',
+          lineWidth: 2,
         },
-      },
+        dim: {
+          opacity: 0.4,
+        },
+      }
     },
     edge: {
       type: 'polyline',
@@ -66,11 +82,16 @@ onMounted(async () => {
         startArrow: true,
         // endArrow: true,
         // stroke: '#F6BD16',
-        stroke: '#000',
+        // stroke: '#e0e0e0',
+        opacity: 1,
       },
       state: {
+        // selected: {
+        //   stroke: '#fbc353',
+        // },
         dim: {
-          stroke: '#cbd5e7',
+          // stroke: '#cbd5e7',
+          opacity: 0.4,
         },
       },
     },
@@ -82,6 +103,29 @@ onMounted(async () => {
       // rankSep: 180, // 增加斥力
     },
     plugins: [
+      {
+        type: 'toolbar',
+        position: 'top-left',
+        onClick: (item) => {
+          console.log('item clicked:' + item);
+
+          toolbarMap[item]?.();
+        },
+        getItems: () => {
+          // G6 内置了 9 个 icon，分别是 zoom-in、zoom-out、redo、undo、edit、delete、auto-fit、export、reset
+          return [
+            { id: 'zoom-in', value: 'zoom-in' },
+            { id: 'zoom-out', value: 'zoom-out' },
+            // { id: 'redo', value: 'redo' },
+            // { id: 'undo', value: 'undo' },
+            // { id: 'edit', value: 'edit' },
+            // { id: 'delete', value: 'delete' },
+            // { id: 'auto-fit', value: 'auto-fit' },
+            // { id: 'export', value: 'export' },
+            { id: 'reset', value: 'reset' },
+          ];
+        },
+      },
       {
         type: 'tooltip',
         trigger: 'click',
