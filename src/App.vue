@@ -46,7 +46,7 @@ onMounted(async () => {
       {
         type: 'click-select',
         // inactiveState: 'dim',
-        degree: true,
+        // degree: true,
         multiple: true,
         trigger: ['shift'],
         // unselectedState: 'inactive',
@@ -128,7 +128,7 @@ onMounted(async () => {
       },
       {
         type: 'tooltip',
-        trigger: 'click',
+        // trigger: 'click',
         getContent: (e, items) => {
           let result = `<h4>Custom Content</h4>`;
           items.forEach((item) => {
@@ -138,8 +138,6 @@ onMounted(async () => {
         },
       },
     ],
-
-
   });
 
   graph.render();
